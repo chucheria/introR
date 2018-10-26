@@ -1,0 +1,205 @@
+---
+title: "Análisis exploratorio"
+output: 
+  html_notebook:
+    toc: true
+---
+
+El objetivo de este taller es aprender a hacer una exploración de datos. Si miramos la imagen nos centraremos en el cuadrado azul.
+
+![](http://r4ds.had.co.nz/diagrams/data-science-explore.png)
+
+Vamos a explorar el dataset para:
+
+1. Generar preguntas sobre tus datos.
+2. Buscar respuestas a estas preguntas.
+3. Usar lo aprendido para plantearnos nuevos retos sobre este set de datos.
+
+No hay un guión para hacer estos análisis, sientete libre para incorporar cualquier idea que se te ocurra. El objetivo es entender tus datos y la mejor forma de hacerlo es hacerse muchas preguntas. Es difícil porque de primeras no conoces tus datos pero contestar a estas preguntas te lleva a otras.
+
+## Términos
+
+- **Variables**: Una cantidad, cualidad o propiedad que puedes medir. *Peso*.
+- **Valor**: El estado de la variables cuando la mides. *500 gr*.
+- **Observación**: Un conjunto de medidas hechas bajo condiciones similares. Una observación puede contener varios valores, cada uno asociado a una variable. *Peso: 500 gr, Altura: 2m*.
+
+Esto es importante para lo que llamamos *tidy data* o *dato limpio*. Puedes leer más sobre esto en un [paper](http://vita.had.co.nz/papers/tidy-data.pdf).
+
+## Cargar paquetes
+
+Primero tenemos que cargar los paquetes que nos serán utiles a lo largo de todo el taller. Si no tenemos instalados los paquetes lo hacemos con la instrucción `install.packages()`. Solo necesitas instalarlo una vez.
+
+Para cargar los paquetes lo hacemos con la instrucción `library()`
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+En este caso utilizaremos `dplyr` para transformar los datos y `ggplot2` para visualizarlos.
+
+## Distribuciones
+
+Vamos a ir aprendiendo los comandos a la vez que exploramos el dataset.
+
+La propia librería `ggplot` nos importa unos datasets pequeños y vamos a utilizar uno de ellos para trabajar. El conjunto de datos se llama `diamonds` y contiene precios y otros atributos de unos 50.000 diamantes.
+
+```{r}
+data(diamonds)
+```
+
+Si miramos a nuestro entorno podemos ver que ya se nos ha cargado el dataset y se ha quedado almacenado en una variable. Esto no pasa siempre, solo con los set de datos *precargados* en los paquetes de R. Si leyesemos datos de otro sitio tendríamos que almacenarlos en una variable con la asignación `<-`.
+
+#### 1. ¿Cómo podríamos obtener ayuda sobre el dataset?
+
+```{r}
+?diamonds
+```
+
+Como visualizamos una variable dependerá si es categórica (*marca*) o continua (*peso*). En este caso vamos a ver la distribución de los cortes de los diamantes:
+
+```{r}
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut))
+```
+
+Podemos ver el conteo de las observaciones por corte del diamante (`cut`). Con `ggplot2` empiezas un gráfico llamando a la función `ggplot` y el primer argumento que toma son los datos de los que queremos extraer información. Lo siguiente que vamos haciendo es añadir capas al gráfico, en este caso hemos añadido `geom_bar` que además nos hace el conteo de las observaciones directamente. El argumento `mapping` toma las variables necesarias para pintar el gráfico. Además podríamos añadir otras capas como escalas, colores,... 
+
+Con `dplyr` también podemos extraer esta información fácilmente:
+
+```{r}
+diamonds %>% 
+  count(cut)
+```
+
+El `%>%` (*pipe*) sirve para concatenar instrucciones: elegimos la variable con la que vamos a tratar (`diamonds`) y sobre esa variable hacemos un conteo (`count`) de la columna `cut`. El pipe coje la información de la iteración anterior:
+
+```{r}
+diamonds %>% 
+  count(cut) %>%
+  arrange(desc(n))
+```
+
+#### 2. Utiliza geom_histogram para visualizar la variable continua `carat`
+
+Un histograma divide el eje x en partes iguales y utiliza la altura de la barra para mostrar el número de observaciones que caen en esa partición. Puedes utilizar el argumento `binwidth` de `geom_histogram` para cambiar el número de particiones.
+
+A continuación vamos a filtrar los diamantes que tengan menos de 3 quilates.
+
+```{r}
+peques <- diamonds %>% 
+  filter(carat < 3)
+
+peques
+```
+
+Y visualizarlos por corte:
+
+```{r}
+ggplot(data = peques, mapping = aes(x = carat, colour = cut)) +
+  geom_freqpoly(binwidth = 0.1)
+```
+
+## Explorando los valores
+
+Es muy interesante ver qué valores son los más comunes, los menos, y patrones inusuales. En los quilates, de nuevo, un histograma es lo más interesante:
+
+```{r}
+ggplot(data = peques, mapping = aes(x = carat)) +
+  geom_histogram(binwidth = 0.01)
+```
+
+#### 3. Selecciona con `select` las columnas `x`, `y` y `z` y usa `geom_histogram` y `filter` para encontrar patrones extraños.
+
+```{r}
+ggplot(data = peques, mapping = aes(x = x)) +
+  geom_histogram(binwidth = 0.01)
+```
+
+```{r}
+ggplot(data = peques %>% filter(x < 2), mapping = aes(x = x)) +
+  geom_histogram(binwidth = 0.01)
+```
+
+```{r}
+ggplot(data = peques, mapping = aes(x = y)) +
+  geom_histogram(binwidth = 0.01)
+```
+
+```{r}
+diamonds %>% 
+  filter(y < 3 | y > 20)
+```
+
+#### 4. Explora la columna `precio`.
+
+## Valores nulos
+
+Si encontramos valores que no tenemos lo más aconsejable antes de deshechar toda la fila es ponerlos como `NA` que significa `Not Available` o `Not Applicable`. Esto nos ayuda a controlar las variables que no son reales y `NA` al ser un tipo de variable del lenguaje está considerado en todas las funciones. Si lo dejasemos como 0, al hacer una media ya nos saldría desvirtuada.
+
+Para modificar una columna nos ayudamos de la función `mutate` y de la función `ifelse` que es igual que la que tiene R implementada pero con una sintaxis más corta.
+
+```{r}
+diamonds_limpio <- diamonds %>% 
+  mutate(y = ifelse(y < 3 | y > 20, NA, y),
+         x = ifelse(x < 2, NA, x)) 
+```
+
+Así tenemos datos más *limpios* y además nos avisan de que hay observaciones que no se están incluyendo en el gráfico porque son `NA`:
+
+```{r}
+ggplot(data = diamonds_limpio, mapping = aes(x = x, y = y)) + 
+  geom_point()
+```
+
+## Explorando variables categóricas y continuas al mismo tiempo
+
+Hay un tipo de gráfico muy útil para estas ocasiones llamado `boxplot` que nos ayuda a ver la distribución de las variables en nuestro dataset. Cada `boxplot` consiste en:
+
+- una caja que va desde el percentil 25 (valor en el cual están el 25% de observaciones) al 75. En el medio hay una línea que representa la mediana. 
+- unos puntos que son las observaciones que están fuera de esta caja, a 1.5 del IQR (perc 75 - perc 25) **outliers**
+- unas lineas que van desde el final de la caja hasta el primer punto que está fuera pero no es outlier.
+
+![](https://r4ds.had.co.nz/images/EDA-boxplot.png)
+
+```{r}
+ggplot(data = diamonds_limpio, mapping = aes(x = cut, y = price)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+#### 5. Con la ayuda utiliza un `geom_violin` para hacer comparar el corte y el precio. ¿Qué diferencia hay con `geom_boxplot`?
+
+```{r}
+ggplot(data = diamonds_limpio, mapping = aes(x = cut, y = price)) +
+  geom_violin() 
+```
+
+## Variables categóricas
+
+Para visualizar la relación entre dos variables categóricas, necesitamos contar el número de observaciones que se da en la combinación de ambos valores. Lo podemos hacer con `geom_count`. Si miramos la ayuda podemos qué geometría tiene por defecto:
+
+```{r}
+ggplot(data = diamonds_limpio) +
+  geom_count(mapping = aes(x = cut, y = color))
+```
+
+Cuanto más gordo sea el círculo más observaciones hay bajo esas condiciones. Podemos visualizarlo de otra manera más fácil haciendo el conteo primero y luego ayudándonos de color:
+
+```{r}
+diamonds_limpio %>% 
+  count(color, cut) %>%  
+  ggplot(mapping = aes(x = color, y = cut)) +
+    geom_tile(mapping = aes(fill = n))
+```
+
+## Variables continuas
+
+#### 6. Investiga la relación entre quilates y precio con `geom_point`. Añade también la variable `cut`. ¿Cómo puedes visualizar 3 variables a la vez?
+
+```{r}
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price, color=cut))
+```
+
+Puedes seguir ampliando este tema en [R for DS](http://r4ds.had.co.nz/data-visualisation.html#data-visualisation).
