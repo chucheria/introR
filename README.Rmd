@@ -1,0 +1,8 @@
+---
+title: "README"
+output:
+  md_document:
+    variant: markdown_github
+---
+
+Bajate el proyecto y ejecuta los `.Rmd`. Voilá!
