@@ -1,8 +1,11 @@
 ---
 title: "Análisis exploratorio"
-output: 
+output:
+  html_document:
+    df_print: paged
+    toc: yes
   html_notebook:
-    toc: true
+    toc: yes
 ---
 
 El objetivo de este taller es aprender a hacer una exploración de datos. Si miramos la imagen nos centraremos en el cuadrado azul.

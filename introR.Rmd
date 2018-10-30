@@ -1,9 +1,12 @@
 ---
 title: "Introducción a R"
-subtitle: "Introducción a R por R-Ladies"
-output: 
+subtitle: Introducción a R por R-Ladies
+output:
+  html_document:
+    df_print: paged
+    toc: yes
   html_notebook:
-    toc: true
+    toc: yes
 ---
 
 ## R y RStudio
