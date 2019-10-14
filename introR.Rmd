@@ -9,15 +9,7 @@ output:
     toc: yes
 ---
 
-## R y RStudio
 
-[R](https://www.r-project.org/) es un lenguaje de programación para mantenido por la [R foundation](https://www.r-project.org/foundation/). R es usado mayormente por estadísticos y científicos de datos en sus desarrollos. 
-
-El código fuente está desarrollado en C en su mayoría, además de Java y el propio R y está displonible bajo una licencia [GNU](https://en.wikipedia.org/wiki/GNU_General_Public_License). R tiene una linea de comandos y varios entornos de desarrollo, entre ellos [RStudio](https://www.rstudio.com/).
-
-RStudio es una empresa que ha desarrollado un IDE gratuito y open source y que ofrece soluciones profesionales.
-
-![](https://swcarpentry.github.io/r-novice-gapminder/fig/01-rstudio.png)
 
 La primera vez que lo abrimos vemos la pantalla dividida en dos:
 
