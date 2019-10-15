@@ -1,5 +1,6 @@
 ---
 title: "Take your stats and make them tidy"
+subtitle: "R is the programming language of choice for pirates"
 output: 
   revealjs::revealjs_presentation:
     css: rladies.css
@@ -7,7 +8,7 @@ output:
     transition: slide
 ---
 
-# El lenguaje de programación
+# Básicos
 
 ## R
 
@@ -28,3 +29,123 @@ Empresa `r emo::ji("plus")` IDE
 ## 
 
 ![](https://bookdown.org/ndphillips/YaRrr/images/RStudio_Screenshot_Labels.png)
+
+# El lenguage
+
+## Operaciones
+
+Operaciones básicas: `+`, `-`, `*`, `/` 
+```{r console}
+110 + 2 / 2 
+```
+
+Operadores: `()`, `[]`
+```{r operators}
+(110 + 2) / 2
+```
+
+## Funciones
+
+La función primero, los argumentos entre paréntesis:
+
+```{r functions}
+log(1)
+```
+
+¿Necesitas ayuda? 
+
+Puedes obtenerla en la consola
+
+```{r help}
+?log
+```
+
+## Comparadores
+
+```{r compare}
+1 == 1
+```
+
+```{r strings_comparison}
+'a' < 'b'
+```
+
+## Variables
+
+```{r vars}
+x <- 3
+x
+
+y = 2
+y
+```
+
+# Estructuras de datos
+
+## Tipos simples
+
+En R todo es un objeto.
+
+```{r simple}
+class(2)
+class(2L)
+```
+
+## Tipos simples
+
+```{r}
+class('a')
+class(TRUE)
+class(1+3i)
+```
+
+## Tipos complejos
+
+Vectores (vectores atómicos)
+
+```{r vectors}
+x <- numeric(5)
+y <- c(0,0,0,0,0)
+x == y
+x
+```
+
+## Tipos complejos
+
+Listas (vectores)
+
+```{r lists}
+c("hola", 2)
+```
+
+## Tipos complejos
+
+Matrices y dataframes
+
+
+## Tipos complejos
+
+Factores
+
+
+# Condicionales & bucles
+
+## Condicionales
+
+```{r}
+x <- sample(c(TRUE, FALSE), 1)
+print(x)
+if (x == TRUE) {
+  cat('Esto es verdadero')
+} else {
+  cat('Esto es falso')
+}
+```
+
+## Resources
+
+[https://swcarpentry.github.io/r-novice-inflammation/13-supp-data-structures/](Software carpentry)
+[https://bookdown.org/ndphillips/YaRrr/](YaRrr! The Pirate's Guide to R)
+
+
+

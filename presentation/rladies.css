@@ -24,6 +24,11 @@
     color: #88398A;
 }
 
+.subtitle {
+    font-size: 1.0em !important;
+    color: #562457 !important;
+}
+
 .title-h2 h2 {
     text-align: left;
     font-size: 1em;
