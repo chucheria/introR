@@ -6,6 +6,7 @@ output:
     css: rladies.css
     highlight: pygments
     transition: slide
+    previewLinks: false
 ---
 
 # Básicos
@@ -116,17 +117,41 @@ Listas (vectores)
 
 ```{r lists}
 c("hola", 2)
+list("hola", 2)
 ```
 
 ## Tipos complejos
 
-Matrices y dataframes
+Matrices
 
+Una matriz no es más que un vector con más de una dimensión. 
+
+```{r matrix}
+matrix(c(1, 2, 3, 11, 12, 13),
+               nrow = 2,
+               ncol = 3,
+               byrow = TRUE)
+```
+
+## Tipos complejos
+
+Dataframes
+
+```{r df}
+mtcars
+```
 
 ## Tipos complejos
 
 Factores
 
+Estructura predefinida que toma finitos valores.
+
+```{r factors}
+x <- factor(c("bueno", "regular", "malo", "bueno", "regular"))
+levels(x)
+ordered(x, levels = c("malo", "regular", "bueno"))
+```
 
 # Condicionales & bucles
 
@@ -142,10 +167,40 @@ if (x == TRUE) {
 }
 ```
 
-## Resources
+## Bucles
 
-[https://swcarpentry.github.io/r-novice-inflammation/13-supp-data-structures/](Software carpentry)
-[https://bookdown.org/ndphillips/YaRrr/](YaRrr! The Pirate's Guide to R)
+```{r}
+for (i in seq(1,5)) {
+  cat(paste0('Yo soy el número ', i, '\n'))
+}
+```
+
+# Paquetes
+
+## 
+
+Instalar un paquete
+
+```{r eval=F}
+install.packages("tidyverse")
+```
+
+Importar un paquete
+
+```{r eval=F}
+library("tidyverse")
+```
+
+# Resources
+
+##
+
+- [Software carpentry](https://swcarpentry.github.io/r-novice-inflammation/13-supp-data-structures/)
+- [YaRrr! The Pirate's Guide to R](https://bookdown.org/ndphillips/YaRrr/)
+- [R for Data Science](https://r4ds.had.co.nz/)
+- [Data Science Live Book](https://livebook.datascienceheroes.com/)
+
+
 
 
 

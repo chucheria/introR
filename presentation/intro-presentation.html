@@ -1977,8 +1977,8 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <pre><code>## [1] &quot;numeric&quot;</code></pre>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw">class</span>(2L)</a></code></pre></div>
 <pre><code>## [1] &quot;integer&quot;</code></pre>
-</section><section id="section-1" class="slide level2">
-<h2></h2>
+</section><section id="tipos-simples-1" class="slide level2">
+<h2>Tipos simples</h2>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">class</span>(<span class="st">'a'</span>)</a></code></pre></div>
 <pre><code>## [1] &quot;character&quot;</code></pre>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw">class</span>(<span class="ot">TRUE</span>)</a></code></pre></div>
@@ -1987,25 +1987,120 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <pre><code>## [1] &quot;complex&quot;</code></pre>
 </section><section id="tipos-complejos" class="slide level2">
 <h2>Tipos complejos</h2>
-<p>Vectores</p>
+<p>Vectores (vectores atómicos)</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="dv">5</span>)</a>
 <a class="sourceLine" id="cb26-2" data-line-number="2">y &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>)</a>
 <a class="sourceLine" id="cb26-3" data-line-number="3">x <span class="op">==</span><span class="st"> </span>y</a></code></pre></div>
 <pre><code>## [1] TRUE TRUE TRUE TRUE TRUE</code></pre>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">x</a></code></pre></div>
 <pre><code>## [1] 0 0 0 0 0</code></pre>
+</section><section id="tipos-complejos-1" class="slide level2">
+<h2>Tipos complejos</h2>
+<p>Listas (vectores)</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="kw">c</span>(<span class="st">&quot;hola&quot;</span>, <span class="dv">2</span>)</a></code></pre></div>
+<pre><code>## [1] &quot;hola&quot; &quot;2&quot;</code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw">list</span>(<span class="st">&quot;hola&quot;</span>, <span class="dv">2</span>)</a></code></pre></div>
+<pre><code>## [[1]]
+## [1] &quot;hola&quot;
+## 
+## [[2]]
+## [1] 2</code></pre>
+</section><section id="tipos-complejos-2" class="slide level2">
+<h2>Tipos complejos</h2>
+<p>Matrices</p>
+<p>Una matriz no es más que un vector con más de una dimensión.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1"><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">11</span>, <span class="dv">12</span>, <span class="dv">13</span>),</a>
+<a class="sourceLine" id="cb34-2" data-line-number="2">               <span class="dt">nrow =</span> <span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb34-3" data-line-number="3">               <span class="dt">ncol =</span> <span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb34-4" data-line-number="4">               <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    2    3
+## [2,]   11   12   13</code></pre>
+</section><section id="tipos-complejos-3" class="slide level2">
+<h2>Tipos complejos</h2>
+<p>Dataframes</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1">mtcars</a></code></pre></div>
+<pre><code>##                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
+## Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
+## Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+## Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+## Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
+## Merc 280            19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4
+## Merc 280C           17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4
+## Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
+## Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+## Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
+## Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
+## Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
+## Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
+## Fiat 128            32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
+## Honda Civic         30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+## Toyota Corolla      33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+## Toyota Corona       21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
+## Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
+## AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
+## Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
+## Pontiac Firebird    19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
+## Fiat X1-9           27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
+## Porsche 914-2       26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
+## Lotus Europa        30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
+## Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
+## Ferrari Dino        19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
+## Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
+## Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</code></pre>
+</section><section id="tipos-complejos-4" class="slide level2">
+<h2>Tipos complejos</h2>
+<p>Factores</p>
+<p>Estructura predefinida que toma finitos valores.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw">factor</span>(<span class="kw">c</span>(<span class="st">&quot;bueno&quot;</span>, <span class="st">&quot;regular&quot;</span>, <span class="st">&quot;malo&quot;</span>, <span class="st">&quot;bueno&quot;</span>, <span class="st">&quot;regular&quot;</span>))</a>
+<a class="sourceLine" id="cb38-2" data-line-number="2"><span class="kw">levels</span>(x)</a></code></pre></div>
+<pre><code>## [1] &quot;bueno&quot;   &quot;malo&quot;    &quot;regular&quot;</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="kw">ordered</span>(x, <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;malo&quot;</span>, <span class="st">&quot;regular&quot;</span>, <span class="st">&quot;bueno&quot;</span>))</a></code></pre></div>
+<pre><code>## [1] bueno   regular malo    bueno   regular
+## Levels: malo &lt; regular &lt; bueno</code></pre>
 </section></section>
 <section><section id="condicionales-bucles" class="title-slide slide level1"><h1>Condicionales &amp; bucles</h1></section><section id="condicionales" class="slide level2">
 <h2>Condicionales</h2>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>), <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb30-2" data-line-number="2"><span class="kw">print</span>(x)</a></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>), <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb42-2" data-line-number="2"><span class="kw">print</span>(x)</a></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="cf">if</span> (x <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>) {</a>
-<a class="sourceLine" id="cb32-2" data-line-number="2">  <span class="kw">cat</span>(<span class="st">'Esto es verdadero'</span>)</a>
-<a class="sourceLine" id="cb32-3" data-line-number="3">} <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb32-4" data-line-number="4">  <span class="kw">cat</span>(<span class="st">'Esto es falso'</span>)</a>
-<a class="sourceLine" id="cb32-5" data-line-number="5">}</a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="cf">if</span> (x <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>) {</a>
+<a class="sourceLine" id="cb44-2" data-line-number="2">  <span class="kw">cat</span>(<span class="st">'Esto es verdadero'</span>)</a>
+<a class="sourceLine" id="cb44-3" data-line-number="3">} <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb44-4" data-line-number="4">  <span class="kw">cat</span>(<span class="st">'Esto es falso'</span>)</a>
+<a class="sourceLine" id="cb44-5" data-line-number="5">}</a></code></pre></div>
 <pre><code>## Esto es verdadero</code></pre>
+</section><section id="bucles" class="slide level2">
+<h2>Bucles</h2>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">5</span>)) {</a>
+<a class="sourceLine" id="cb46-2" data-line-number="2">  <span class="kw">cat</span>(<span class="kw">paste0</span>(<span class="st">'Yo soy el número '</span>, i, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>))</a>
+<a class="sourceLine" id="cb46-3" data-line-number="3">}</a></code></pre></div>
+<pre><code>## Yo soy el número 1
+## Yo soy el número 2
+## Yo soy el número 3
+## Yo soy el número 4
+## Yo soy el número 5</code></pre>
+</section></section>
+<section><section id="paquetes" class="title-slide slide level1"><h1>Paquetes</h1></section><section id="section-1" class="slide level2">
+<h2></h2>
+<p>Instalar un paquete</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;tidyverse&quot;</span>)</a></code></pre></div>
+<p>Importar un paquete</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)</a></code></pre></div>
+</section></section>
+<section><section id="resources" class="title-slide slide level1"><h1>Resources</h1></section><section id="section-2" class="slide level2">
+<h2></h2>
+<ul>
+<li><a href="https://swcarpentry.github.io/r-novice-inflammation/13-supp-data-structures/">Software carpentry</a></li>
+<li><a href="https://bookdown.org/ndphillips/YaRrr/">YaRrr! The Pirate’s Guide to R</a></li>
+<li><a href="https://r4ds.had.co.nz/">R for Data Science</a></li>
+<li><a href="https://livebook.datascienceheroes.com/">Data Science Live Book</a></li>
+</ul>
 </section></section>
     </div>
   </div>
