@@ -1,9 +1,9 @@
 ---
 title: "Take your stats and make them tidy"
-subtitle: "R is the programming language of choice for pirates"
+subtitle: "RRRead and wRRRite"
 output: 
   revealjs::revealjs_presentation:
-    css: rladies.css
+    css: ../styles/rladies.css
     highlight: pygments
     transition: slide
     previewLinks: false
