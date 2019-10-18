@@ -191,17 +191,20 @@ Importar un paquete
 library("tidyverse")
 ```
 
-# The tidyverse
+# The Tidyverse
 
 ## ¿Qué es y por qué nos interesa?
 
-El tidyverse es un conjunto de paquetes desarrollados por RStudio diseñados para trabajar juntos de manera "natural".
+El tidyverse es un conjunto de paquetes desarrollados por RStudio diseñados para trabajar juntos en un ecosistema en el que todos siguen la misma gramática.
 
-El propio paquete `tidyverse` se puede instalar y tiene varios paquetes contenidos pero podemos trabajar con ellos por separado e instalar paquetes que no estén incluídos y funcionen de la misma manera.
+- Manipulación de datos 
+- Trabajo con diferentes tipos de datos
+- Visualización
+- Programación funcional
+- Comunicación
+- Modelado
 
-
-
-# Resources
+# Recursos
 
 ##
 

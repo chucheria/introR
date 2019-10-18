@@ -9,198 +9,69 @@ output:
     previewLinks: false
 ---
 
-# Básicos
+# Leer archivos
 
-## R
+## Datos rectangulares
 
-[R](https://www.r-project.org/) `r emo::ji("heart")` [R foundation](https://www.r-project.org/foundation/). 
+```{r readr}
+library(readr)
+read_csv(readr_example("mtcars.csv"))
+```
 
-Mayormente usado por estadísticos y científicos de datos en sus desarrollos. 
+##
 
-C `r emo::ji("plus")` Java `r emo::ji("plus")` R  
+```{r readr-ow}
+read_csv(readr_example("mtcars.csv"), 
+         col_types = c(cyl = col_skip(), disp = col_integer()),
+         trim_ws = TRUE,
+         n_max = 5, 
+         na = c("", NA, NULL, 0))
+```
 
-Open Source ([GNU](https://en.wikipedia.org/wiki/GNU_General_Public_License))
+## Excel
 
-## RStudio
-
-Empresa `r emo::ji("plus")` IDE 
-
-![](https://swcarpentry.github.io/r-novice-gapminder/fig/01-rstudio.png)
+```{r excel}
+library(readxl)
+file <- readxl_example("datasets.xlsx")
+read_excel(file)
+```
 
 ## 
 
-![](https://bookdown.org/ndphillips/YaRrr/images/RStudio_Screenshot_Labels.png)
-
-# El lenguage
-
-## Operaciones
-
-Operaciones básicas: `+`, `-`, `*`, `/` 
-```{r console}
-110 + 2 / 2 
+```{r excel-ow}
+excel_sheets(file)
+read_excel(file, sheet = "quakes", 
+           range = "B1:D10", 
+           na = "4")
 ```
 
-Operadores: `()`, `[]`
-```{r operators}
-(110 + 2) / 2
+## SPSS, SAS
+
+```{r haven}
+library(haven)
+file <- system.file("examples", "iris.dta", package = "haven")
+read_dta(file)
 ```
 
-## Funciones
+# Escribir archivos
 
-La función primero, los argumentos entre paréntesis:
+## Con readr
 
-```{r functions}
-log(1)
+- `write_csv`
+- `write_excel_csv`
+- `write_rds`
+- ...
+
+```{r write, eval=F}
+write_csv(temp, "temp.csv")
 ```
 
-¿Necesitas ayuda? 
-
-Puedes obtenerla en la consola
-
-```{r help}
-?log
-```
-
-## Comparadores
-
-```{r compare}
-1 == 1
-```
-
-```{r strings_comparison}
-'a' < 'b'
-```
-
-## Variables
-
-```{r vars}
-x <- 3
-x
-
-y = 2
-y
-```
-
-# Estructuras de datos
-
-## Tipos simples
-
-En R todo es un objeto.
-
-```{r simple}
-class(2)
-class(2L)
-```
-
-## Tipos simples
-
-```{r}
-class('a')
-class(TRUE)
-class(1+3i)
-```
-
-## Tipos complejos
-
-Vectores (vectores atómicos)
-
-```{r vectors}
-x <- numeric(5)
-y <- c(0,0,0,0,0)
-x == y
-x
-```
-
-## Tipos complejos
-
-Listas (vectores)
-
-```{r lists}
-c("hola", 2)
-list("hola", 2)
-```
-
-## Tipos complejos
-
-Matrices
-
-Una matriz no es más que un vector con más de una dimensión. 
-
-```{r matrix}
-matrix(c(1, 2, 3, 11, 12, 13),
-               nrow = 2,
-               ncol = 3,
-               byrow = TRUE)
-```
-
-## Tipos complejos
-
-Dataframes
-
-```{r df}
-mtcars
-```
-
-## Tipos complejos
-
-Factores
-
-Estructura predefinida que toma finitos valores.
-
-```{r factors}
-x <- factor(c("bueno", "regular", "malo", "bueno", "regular"))
-levels(x)
-ordered(x, levels = c("malo", "regular", "bueno"))
-```
-
-# Condicionales & bucles
-
-## Condicionales
-
-```{r}
-x <- sample(c(TRUE, FALSE), 1)
-print(x)
-if (x == TRUE) {
-  cat('Esto es verdadero')
-} else {
-  cat('Esto es falso')
-}
-```
-
-## Bucles
-
-```{r}
-for (i in seq(1,5)) {
-  cat(paste0('Yo soy el número ', i, '\n'))
-}
-```
-
-# Paquetes
-
-## 
-
-Instalar un paquete
-
-```{r eval=F}
-install.packages("tidyverse")
-```
-
-Importar un paquete
-
-```{r eval=F}
-library("tidyverse")
-```
 
 # Resources
 
 ##
 
-- [Software carpentry](https://swcarpentry.github.io/r-novice-inflammation/13-supp-data-structures/)
-- [YaRrr! The Pirate's Guide to R](https://bookdown.org/ndphillips/YaRrr/)
-- [R for Data Science](https://r4ds.had.co.nz/)
-- [Data Science Live Book](https://livebook.datascienceheroes.com/)
-
-
-
+- [Tidyxl](https://github.com/nacnudus/tidyxl): Lee excel complicados
+- [xml2](https://github.com/r-lib/xml2): Lee xml
 
 
