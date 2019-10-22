@@ -8,6 +8,10 @@ log(1)
 # Compare
 1 == 1
 'a' < 'b'
+## Floating point
+sqrt(2) ^ 2 == 2
+1 / 49 * 49 == 1
+dplyr::near(sqrt(2) ^ 2 == 2)
 
 # Variables
 x <- 3
