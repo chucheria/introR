@@ -22,3 +22,5 @@ filter(
   is.na(x)
 )
 
+########## Arrange
+arrange(flights, year, month, day)
