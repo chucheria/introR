@@ -67,3 +67,27 @@ flights %>%
             delay = mean(arr_delay, na.rm = TRUE)
 ) %>% 
   filter(delay, count > 20, dest != "HNL")
+
+# Useful summary functions
+flights %>% 
+  group_by(year, month, day) %>% 
+  summarise(
+    avg_delay1 = mean(arr_delay),
+    avg_delay2 = mean(arr_delay[arr_delay > 0]) # the average positive delay
+  )
+
+flights %>% 
+  group_by(dest) %>% 
+  summarise(distance_sd = sd(distance)) %>% 
+  arrange(desc(distance_sd))
+
+flights %>% 
+  count(dest)
+
+flights %>% 
+  group_by(year, month, day) %>% 
+  summarise(n_early = sum(dep_time < 500))
+
+group_by(flights, year, month, day) %>% 
+  ungroup() %>%       
+  summarise(flights = n())
