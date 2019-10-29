@@ -1459,6 +1459,7 @@ color: #181818;
 font-family: Arial, Helvetica, "Helvetica Neue", sans-serif;
 }
 .reveal h1 {
+padding-top: 1em;
 font-size: 3.0em;
 color: #88398A;
 }
@@ -2068,13 +2069,13 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <h2>Condicionales</h2>
 <div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>), <span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb42-2" data-line-number="2"><span class="kw">print</span>(x)</a></code></pre></div>
-<pre><code>## [1] TRUE</code></pre>
+<pre><code>## [1] FALSE</code></pre>
 <div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="cf">if</span> (x <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>) {</a>
 <a class="sourceLine" id="cb44-2" data-line-number="2">  <span class="kw">cat</span>(<span class="st">'Esto es verdadero'</span>)</a>
 <a class="sourceLine" id="cb44-3" data-line-number="3">} <span class="cf">else</span> {</a>
 <a class="sourceLine" id="cb44-4" data-line-number="4">  <span class="kw">cat</span>(<span class="st">'Esto es falso'</span>)</a>
 <a class="sourceLine" id="cb44-5" data-line-number="5">}</a></code></pre></div>
-<pre><code>## Esto es verdadero</code></pre>
+<pre><code>## Esto es falso</code></pre>
 </section><section id="bucles" class="slide level2">
 <h2>Bucles</h2>
 <div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">5</span>)) {</a>
@@ -2093,7 +2094,19 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <p>Importar un paquete</p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)</a></code></pre></div>
 </section></section>
-<section><section id="resources" class="title-slide slide level1"><h1>Resources</h1></section><section id="section-2" class="slide level2">
+<section><section id="the-tidyverse" class="title-slide slide level1"><h1>The Tidyverse</h1></section><section id="que-es-y-por-que-nos-interesa" class="slide level2">
+<h2>¿Qué es y por qué nos interesa?</h2>
+<p>El tidyverse es un conjunto de paquetes desarrollados por RStudio diseñados para trabajar juntos en un ecosistema en el que todos siguen la misma gramática.</p>
+<ul>
+<li>Manipulación de datos</li>
+<li>Trabajo con diferentes tipos de datos</li>
+<li>Visualización</li>
+<li>Programación funcional</li>
+<li>Comunicación</li>
+<li>Modelado</li>
+</ul>
+</section></section>
+<section><section id="recursos" class="title-slide slide level1"><h1>Recursos</h1></section><section id="section-2" class="slide level2">
 <h2></h2>
 <ul>
 <li><a href="https://swcarpentry.github.io/r-novice-inflammation/13-supp-data-structures/">Software carpentry</a></li>

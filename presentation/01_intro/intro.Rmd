@@ -3,7 +3,7 @@ title: "Take your stats and make them tidy"
 subtitle: "R is the programming language of choice for pirates"
 output: 
   revealjs::revealjs_presentation:
-    css: rladies.css
+    css: ../styles/rladies.css
     highlight: pygments
     transition: slide
     previewLinks: false
@@ -191,7 +191,20 @@ Importar un paquete
 library("tidyverse")
 ```
 
-# Resources
+# The Tidyverse
+
+## ¿Qué es y por qué nos interesa?
+
+El tidyverse es un conjunto de paquetes desarrollados por RStudio diseñados para trabajar juntos en un ecosistema en el que todos siguen la misma gramática.
+
+- Manipulación de datos 
+- Trabajo con diferentes tipos de datos
+- Visualización
+- Programación funcional
+- Comunicación
+- Modelado
+
+# Recursos
 
 ##
 
