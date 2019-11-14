@@ -11,35 +11,30 @@ output:
 ---
 
 ```{R}
-library(readr)
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(lubridate)
-library(ggplot2)
-
+library(tidyverse)
 library(broom)
-
-library(purrr)
-library(reshape2)
-
-
-library(forecast)
-library(ggforce)
-library(broom)
-library(data.table)
-library(gridExtra)
 ```
 
 ## 1. Introduction
 
-At the 2016 _PlotCon_ data visualization conference, Hadley Wickham - chief scientist at RStudio and the mastermind behind [my favorite R packages](https://www.tidyverse.org/) - gave [a great talk](https://www.youtube.com/watch?v=cU0-NrUxRw4) about how to use a simple idea of _list columns_ and some tools from functional programming to manage and explore many models at once in a tidy fashion. 
+There are two main ways of working in R:
 
-What I like about this talk - and the proposed technique (which I use in this notebook) - is that Wickham shows how to muse _modeling as a form of data exploration_. By definition, statistical models are limited to the data and features you train them on, and since their behavior is so closely tied to your initial assumptions, they rarely illuminate aspects of your data that you were not already aware of.
+- Base way
+- "Tidy" way
 
-Wickham proposes a simple but powerful technique to use modeling as a tool to _understand and learn about your data_ - not only as a means to form predictions or formalize statistical properties. If one is interested in learning about the behavior of different groups of data  within a dataset (in this case, the groups are different Wikipedia pages), Whickham suggests to create a dataframe where there is one row per group, and all the data associated with that group is stored in a _column of dataframes_. The result is a dataframe of dataframes. Then, one can apply modeling techniques to each group in parallel, and use corresponding measures of fitness or properties of the parameters to learn about each group. 
+The base R has been around for decades now, it was made by statistians and software programmers for statistians. R is the evolution of S, a statistical programming language. It has some S legacy (less and less every update) and didn't count for the "new data science" since this field, even being statistics and algebra, it is a pretty new field.
 
-In this notebook, I use this technique to fit statistical models to the time series of each Wikipedia article in parralel. I then use the properties of these models to try and learn about the time series themselves. 
+[https://www.tidyverse.org/](Tidyverse) is an opinionated collection of packages design for data science. They all - except ggplot2 - follow the same grammar and allow for mixing and matching, working pretty well together.
+
+Some criticism:
+
+Even with all the advantages we have with this bundle of packages in my experience working with big datasets and the tidyverse can be slow, so that's why I recommend it for exploration and testing models. I'm sure the 98% of the times you are working with data you will be safe, it is not like we are managing big datasets or big data everyday.
+
+In this workshop we are tackling data _the tidy way_, some functional programming will allow us to manage and explore many models at once. This goes beyond the usual exploration - modelling to use modelling as a form of data exploration. 
+
+You could argue that a model (almost by definition) is close to your initial assumptions, that's why the exploration step is done. Here we are going to use modelling to learn about the data, not only predictions but behavior of different groups of data within a dataset.
+
+The outline of this exercise is to create a dataframe where there's one row per group an all data associated with that group is stored in a _column of dataframes_. Then, one can apply modelling techniques to each group and use the output to learn about each group.
 
 ## 1. Wikipedia Data - a first look
 
@@ -49,8 +44,7 @@ First, I'll need to load the data, and reshape it so that it's easier to work wi
 
 ```{R}
 # Training data
-data <- read_csv(file = "data/train.csv") %>% 
-  select(-X1)
+data <- read_csv(file = "data/train.csv")
 ```
 
 #### 1.2 Making the data Tidy
@@ -83,7 +77,7 @@ Using the `reshape2` package, we can convert the data so that it has this exact 
 ```{R}
 # convert to long format. 
 data <- data %>%
-      gather(key = "date", value = "views", -Page)
+      gather(key = "date", value = "views", -Page, -language)
 
 head(data)
 ```
@@ -105,9 +99,8 @@ To do this, we'll have to remove the leading `X` characters at the begining of e
 ```{R}
 data <- data %>%
   mutate(date = str_replace(pattern = "X", replacement = "", date)) %>% 
-  mutate(date = ymd(date))
+  mutate(date = as.POSIXct(date, format = "%Y.%m.%d")) 
   
-
 head(data)
 ```
 
@@ -149,7 +142,7 @@ Now, we transform the dataset into a dataframe such that every page populats one
 ```{R}
 # dataframes within dataframes
 nested <-  data %>%
-      group_by(Page) %>%
+      group_by(Page, language) %>%
       nest()
 ```
 
@@ -212,9 +205,9 @@ Taking a closer look at a sample of 30 page names, we can see that there is a lo
 ```{R}
 set.seed(42)
 nested %>%
-      sample_n(size = 30) %>%
-      select(Page)
-
+  ungroup() %>% 
+  select(Page) %>% 
+  sample_n(30)
 ```
 
 Some of the things I've noticed:
@@ -229,12 +222,6 @@ The first thing I'd be interested in is extracting the language of the article. 
 
 Using a simple regular expression, I can extract the two letters that precede the first period in the page - in hopes that the pattern I've seen in this sample extend to the rest of the data. 
 
-```{R}
-nested <- nested %>%
-      # a positive lookahead - extract two letters preceding first period. 
-      mutate(language = str_match(pattern = regex("[a-z][a-z](?=\\.)"), Page))
-
-```
 
 ```{R}
 nested %>%
