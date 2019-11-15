@@ -1,0 +1,87 @@
+---
+title: "Managing and Exploring Many Models using `purrr` and `broom`"
+output:
+  html_document:
+    messages: no
+    toc: true
+    toc_depth: 3
+    number_sections: TRUE
+---
+
+# Introduction
+
+There are two main ways of working in R:
+
+- Base way
+- "Tidy" way
+
+The base R has been around for decades now, it was made by statistians and software programmers for statistians. R is the evolution of S, a statistical programming language. It has some S legacy (less and less every update) and didn't count for the "new data science" since this field, even being statistics and algebra, it is a pretty new field.
+
+[https://www.tidyverse.org/](Tidyverse) is an opinionated collection of packages design for data science. They all - except ggplot2 - follow the same grammar and allow for mixing and matching, working pretty well together.
+
+Some criticism:
+
+Even with all the advantages we have with this bundle of packages in my experience working with big datasets and the tidyverse can be slow, so that's why I recommend it for exploration and testing models. I'm sure the 98% of the times you are working with data you will be safe, it is not like we are managing big datasets or big data everyday.
+
+In this workshop we are tackling data _the tidy way_, some functional programming will allow us to manage and explore many models at once. This goes beyond the usual exploration - modelling to use modelling as a form of data exploration. 
+
+You could argue that a model (almost by definition) is close to your initial assumptions, that's why the exploration step is done. Here we are going to use modelling to learn about the data, not only predictions but behavior of different groups of data within a dataset.
+
+The outline of this exercise is to create a dataframe where there's one row per group an all data associated with that group is stored in a _column of dataframes_. Then, one can apply modelling techniques to each group and use the output to learn about each group.
+
+***
+
+# Take a look at the data
+
+First, I'll need to load the data, and reshape it so that it's easier to work with. 
+
+
+```{r import_packages}
+library(tidyverse)
+library(broom)
+```
+
+## Loading Data
+
+Depending on your computer limitations, I decided to work with only half of the observations. Nonetheless, you are welcome you use every observation or read a limited number of rows with the argument `nmax` in the `read_csv` function.
+
+```{r read_data}
+set.seed(42)
+# Training data
+data <- read_csv(file = "../data/clean.csv") %>% 
+  sample_frac(0.5)
+```
+
+## Making the data Tidy
+
+At first glance of the data:
+
+```{r glance}
+head(data)
+```
+
+We have 3 clean columns:
+
+- article
+- language
+- domain
+
+And the other 803 are dates and number of views. To get this to be tidy we need:
+
+1. Every column represents one variable
+2. Every row represents one observations.
+
+Which will gives us:
+
+- article name
+- language
+- date
+- number of views
+
+```{r long_format}
+# convert to long format. 
+data <- data %>%
+      gather(key = "date", value = "views", -article, -language, -domain)
+
+tail(data)
+```
