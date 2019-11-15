@@ -1,5 +1,5 @@
 ---
-title: "Managing and Exploring Many Models using `tidyr`, `purrr` and `broom`"
+title: "Managing and Exploring Many Models using `purrr` and `broom`"
 output:
   html_document:
     fig_height: 6
