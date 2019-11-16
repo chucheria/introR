@@ -8,6 +8,9 @@ output:
     transition: slide
 ---
 
+## Hello!
+
+![](images/bea.png)
 
 # Tidy R
 
@@ -44,9 +47,10 @@ Vamos a utilizar dos técnicas para explorar un dataset de manera un poco distin
 ![flat](images/Flat.png)
 
 ![nested](images/Nested.png)
+
 # Importar y leer
 
-##
+## Leer
 
 ```{r eval=F}
 library(tidyverse)
@@ -54,6 +58,230 @@ library(broom)
 
 set.seed(42)
 # Training data
-data <- read_csv(file = "../data/clean.csv") %>% 
+data <- read_csv(file = "https://tinyurl.com/wtmzgz") %>% 
   sample_frac(1)
+
+head(data)
 ```
+
+![](images/1_head.png)
+
+## Pivotar
+
+```{r eval=F}
+data <- data %>%
+  gather(key = ..., value = ..., -article, -language, -domain)
+```
+
+##
+
+```{r eval=F}
+data <- data %>%
+  gather(key = "date", value = "views", -article, -language, -domain)
+```
+
+![](images/2_head.png)
+
+# Consolidar datos
+
+##
+
+```{r eval=F}
+str(data)
+
+data <- data %>%
+  mutate(date = str_replace(pattern = ..., replacement = ..., date))
+```
+
+![](images/3_str.png)
+
+## NESTING!
+
+```{r eval=F}
+nested <-  data %>%
+  group_by(...) %>% 
+  nest()
+```
+
+![](images/4_nested.png)
+
+##
+
+```{r eval=F}
+nested %>% 
+  head(1) %>% 
+  select(...) %>% 
+  .$data
+```
+
+![](images/5_first.png)
+
+##
+
+```{r eval=F}
+nested <- nested %>%
+      mutate(data = map(.f = CAST YOUR DATES)
+                        , .x = data))
+```
+
+##
+
+```{r eval=F}
+nested <- nested %>%
+      mutate(data = map(.f = ~mutate(., date = as.POSIXct(date, 
+                                                       format = "%Y.%m.%d"))
+                        , .x = data))
+```
+
+
+![](images/6_dat.png)
+
+# Comparar idiomas
+
+##
+
+```{r eval=F}
+nested %>%
+  group_by(...) %>% 
+  summarise(n = n()) %>%
+  mutate(freq = n / sum(n) * 100) %>% 
+  filter(freq > 1) %>% 
+  drop_na() %>% 
+  ggplot(aes(x = ..., y = sort(...), fill = language)) +
+  geom_col() +
+  ylab("Proportion of pages with language") + 
+  theme(legend.position = "")
+```
+
+![](images/7_lang.png)
+
+##
+
+```{r eval=F}
+nested <- nested %>%
+  ungroup() %>% 
+  mutate(language = ifelse(
+    language %in% ..., language, "other"))
+```
+
+## 
+
+```{r eval=F}
+nested <- nested %>%
+  ungroup() %>% 
+  mutate(language = ifelse(
+    language %in% c("de", "en", "fr", "ru", "zh", NA), language, "other"))
+```
+
+
+##
+
+```{r eval=F}
+# isolate the first page
+first_page <- head(nested, 1)
+
+# plot the series of the first page
+first_page %>%
+      .$data %>%
+      .[[1]] %>%
+      ggplot(aes(x = ..., y = ..., color = views)) + 
+            geom_point() + 
+            geom_line() + 
+            scale_y_log10()
+```
+
+![](images/8_trend.png)
+
+##
+
+```{r eval=F}
+# apply an arbitrary metrix on the `views` column of of the nested data
+extract_metric <- function(d, metric, ...){
+      metric(d$views, ...)
+}
+
+# map this H.O.F to get the average, median and standard deviation of views
+nested <-  nested %>% 
+  mutate(average.views = map_dbl(.f = extract_metric, 
+                                 .x = data, metric = mean, na.rm = TRUE), 
+         median.views = map_dbl(.f = extract_metric, .x = data, 
+                                metric = median, na.rm = TRUE), 
+         stddev.views = map_dbl(.f = extract_metric, .x = data, 
+                                metric = function(l) sqrt(var(l, na.rm = TRUE))))
+```
+
+![](images/9_metrics.png)
+
+##
+
+```{r eval=F}
+nested %>%
+      ggplot(aes(x = ..., fill = language)) + 
+      geom_density(position = "stack") + 
+      scale_x_log10() +
+      xlab("Average daily views (log scale)")
+```
+
+![](images/10_metric.png)
+
+##
+
+```{r eval=F}
+nested %>%
+      arrange(desc(...))
+```
+
+![](images/11_avg.png)
+
+# Ver tendencias
+
+##
+
+```{r eval=F}
+# a function for fitting SLR to an inptut dataframe
+apply_lm <- function(df){
+      lm(data = df, views ~ date)
+}
+
+# fit a linear model to each page
+nested <-  nested %>%
+      mutate(linear_trend = map(.f = ..., .x = ...))
+
+nested %>%
+  head() %>%
+  select(article, data, linear_trend)
+```
+
+![](images/12_head_lm.png)
+
+##
+
+```{r eval=F}
+# a function for extracting only the R-squared statistics
+extract_r2 <- function(model){
+  glance(model)$r.squared
+}
+
+# map this function onto each model to store the R^2
+nested <- nested %>%
+  mutate(lm.r.squared = purrr::map_dbl(.f = ..., .x = ...))
+
+nested %>%
+  ggplot(aes(x = lm.r.squared)) + 
+  geom_density()
+```
+
+![](images/13_dist_r.png)
+
+## 
+
+```{r eval=F}
+nested %>%
+      arrange(desc(lm.r.squared)) %>%
+      filter(dplyr::between(row_number(), 10, 15)) %>%
+      mutate(chart = purrr::map2(.f = plot_linear_trend, 
+                                 .x = data, .y = article)) %>%
+      .$chart
+```
+
+![](images/14_trend.png)

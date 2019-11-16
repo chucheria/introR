@@ -81,7 +81,7 @@ Which will gives us:
 ```{r long_format}
 # convert to long format. 
 data <- data %>%
-      gather(key = "date", value = "views", -article, -language, -domain)
+  gather(key = "date", value = "views", -article, -language, -domain)
 
 tail(data)
 ```
@@ -212,7 +212,7 @@ This seems to be working well. Now we can compare articles across different lang
 
 If there is clear trend in the data, it would be important to identify it early. Looking at the first time series in the `nested` dataframe as an example. We use a log-scale for the y-axis, we can see some more structure to mitigate the effect of large spikes.
 
-```{R}
+```{r first_page}
 # isolate the first page
 first_page <- head(nested, 1)
 
@@ -227,7 +227,7 @@ first_page %>%
 ```
 
 
-```{R}
+```{r first_page_function}
 # a function to plot a simple time series plot on a log scale for the y-axis 
 plot_series_log <- function(df, title = NULL){
       df %>%
@@ -312,7 +312,7 @@ Standard deviation denotes how far apart all the numbers are in a set.
 Now, arranging the views in terms of decending average view count:
 
 
-```{R}
+```{r desc_avg_views}
 nested %>%
       arrange(desc(average.views))
 ```
@@ -409,7 +409,7 @@ But if we skip the pages with the 50 highest $R^2$ values, we can really see tha
 ```{r 5_middle_r_sq}
 nested %>%
       arrange(desc(lm.r.squared)) %>%
-      filter(dplyr::between(row_number(), 50, 55)) %>%
+      filter(dplyr::between(row_number(), 0 5)) %>%
       mutate(chart = purrr::map2(.f = plot_linear_trend, 
                                  .x = data, .y = article)) %>%
       .$chart
@@ -432,7 +432,7 @@ Now, looking at plots of series which don't have extraordinarily high or low $R^
 ```{r }
 nested %>%
       arrange(desc(lm.r.squared)) %>%
-      filter(dplyr::between(row_number(), 1000, 1005)) %>%
+      filter(dplyr::between(row_number(), 10, 15)) %>%
       mutate(chart = purrr::map2(.f = plot_linear_trend, 
                                  .x = data, .y = article)) %>%
       .$chart
