@@ -1,0 +1,59 @@
+---
+title: "Explorar tus modelos con broom y purrr"
+subtitle: "Tidy stats"
+output: 
+  revealjs::revealjs_presentation:
+    css: styles.css
+    highlight: pygments
+    transition: slide
+---
+
+
+# Tidy R
+
+##
+
+El "tidyverse" es un universo de paquetes de R que siguen una gramática concreta.
+
+Base R
+
+```{r, eval=F}
+subset <- data[ , "column1"]
+```
+
+Tidyverse
+
+```{r, eval=F}
+subset <- select(data, column1)
+
+subset <- data %>% 
+  select(column1)
+```
+
+# Manos a la obra
+
+## Modelar para explorar
+
+Vamos a utilizar dos técnicas para explorar un dataset de manera un poco distinta:
+
+- Programación funcional
+- Modelización para explorar datos
+
+##
+
+![flat](images/Flat.png)
+
+![nested](images/Nested.png)
+# Importar y leer
+
+##
+
+```{r eval=F}
+library(tidyverse)
+library(broom)
+
+set.seed(42)
+# Training data
+data <- read_csv(file = "../data/clean.csv") %>% 
+  sample_frac(1)
+```
