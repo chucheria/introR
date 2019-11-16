@@ -1,0 +1,77 @@
+---
+title: "Take your stats and make them tidy"
+subtitle: "RRRead and wRRRite"
+output: 
+  revealjs::revealjs_presentation:
+    css: ../styles/rladies.css
+    highlight: pygments
+    transition: slide
+    previewLinks: false
+---
+
+# Leer archivos
+
+## Datos rectangulares
+
+```{r readr}
+library(readr)
+read_csv(readr_example("mtcars.csv"))
+```
+
+##
+
+```{r readr-ow}
+read_csv(readr_example("mtcars.csv"), 
+         col_types = c(cyl = col_skip(), disp = col_integer()),
+         trim_ws = TRUE,
+         n_max = 5, 
+         na = c("", NA, NULL, 0))
+```
+
+## Excel
+
+```{r excel}
+library(readxl)
+file <- readxl_example("datasets.xlsx")
+read_excel(file)
+```
+
+## 
+
+```{r excel-ow}
+excel_sheets(file)
+read_excel(file, sheet = "quakes", 
+           range = "B1:D10", 
+           na = "4")
+```
+
+## SPSS, SAS
+
+```{r haven}
+library(haven)
+file <- system.file("examples", "iris.dta", package = "haven")
+read_dta(file)
+```
+
+# Escribir archivos
+
+## Con readr
+
+- `write_csv`
+- `write_excel_csv`
+- `write_rds`
+- ...
+
+```{r write, eval=F}
+write_csv(temp, "temp.csv")
+```
+
+
+# Resources
+
+##
+
+- [Tidyxl](https://github.com/nacnudus/tidyxl): Lee excel complicados
+- [xml2](https://github.com/r-lib/xml2): Lee xml
+
+
