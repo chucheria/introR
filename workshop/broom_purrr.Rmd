@@ -49,7 +49,7 @@ Depending on your computer limitations, I decided to work with only half of the 
 set.seed(42)
 # Training data
 data <- read_csv(file = "../data/clean.csv") %>% 
-  sample_frac(0.5)
+  sample_frac(1)
 ```
 
 ## Making the data Tidy
@@ -84,4 +84,356 @@ data <- data %>%
       gather(key = "date", value = "views", -article, -language, -domain)
 
 tail(data)
+```
+Now, our dataframe of 28,000 rows and ~800 columns has been reshaped to a dataframe of ~22,500,000 rows and 5 columns.
+
+## Consolidating the data
+
+The next step is to make sure each of the columns are of the right data type. 
+
+```{r structure}
+str(data)
+```
+`date` is a character which doesn't look right, to use it as a date we will have to remove the leading `X` character and convert the remaining to date. We also need to convert from character to date class but we are going to wait a bit before doing that.
+
+```{r clean_dates}
+data <- data %>%
+  mutate(date = str_replace(pattern = "X", replacement = "", date))
+  
+head(data)
+```
+## Missing values
+
+Just so we're aware - how many values are missing? Later we are applying an ARIMA model which doesn't do well on missing values.
+
+`r sum(is.na(data$views)) / nrow(data) * 100` % of the view counts are missing. We can't be sure if this means that there were zero views for that page on that day, or if the view count data is simply missing for that day. 
+
+***
+
+# Nesting `dataframes` - a `dataframe` for every page.
+
+Now, we transform the dataset into a dataframe such that every page + language + domain populates one row, and the corresponding data is stored in a list column. This is a three-liner with the `tidyr::nest()` function. **A word of warning** - creating list columns with the `tidyr::nest()` function is very slow  if one of your columns is of type `Date` (see [this Github issue for more details](https://github.com/tidyverse/tidyr/issues/369)). As such, I will first nest the dataframes, and then convert the `date` column in each nested dataframe (initially a `character` datatype) to a native date format. 
+
+```{r nest}
+# dataframes within dataframes
+nested <-  data %>%
+  group_by(article, language, domain) %>% 
+  nest()
+
+head(nested)
+```
+
+Let's take a look to the first observation:
+
+```{r first}
+nested %>% 
+  head(1) %>% 
+  select(data) %>% 
+  .$data
+```
+
+Now we can transform the `date` to a date type.
+
+```{r cast_date}
+nested <- nested %>%
+      mutate(data = map(.f = ~mutate(., date = as.POSIXct(date, 
+                                                       format = "%Y.%m.%d"))
+                        , .x = data))
+```
+
+We have everything like we wanted, we can delete our first dataframe to free some memory.
+
+```{r delete_data}
+head(nested %>% head(1) %>% .$data)
+
+rm(data)
+```
+
+# Before we start modeling... what's the data look like? 
+
+The point of this notebook is to show how to use modeling for data exploration. But even so - I can't jump into modeling without knowing what the data looks like at the least.
+
+I'm most interested in identifying structure in the data that will influence my choices of parameters in models to come, or which models to use. For example, I'd be interested in identifying any trend the pages could have. I'd also be interested in identifying any outliers or extreme values. This may motivate me to transform my data in some way, or use models that are robust to extreme values.
+
+Some interesting questions are:
+
+1. What trend can we observe in the page views?
+2. How variable are the page views across the different pages?
+3. How many pages have very extreme page view counts? 
+
+## Taking a look at the languages
+
+```{r languages}
+nested %>%
+  group_by(language) %>% 
+  summarise(n = n()) %>%
+  mutate(freq = n / sum(n) * 100) %>% 
+  filter(freq > 1) %>% 
+  drop_na() %>% 
+  ggplot(aes(x = language, y = sort(freq), fill = language)) +
+  geom_col() +
+  ylab("Proportion of pages with language") + 
+  theme(legend.position = "")
+```
+Using this extraction method, we can see those languages with more than 1% of total pages (droping NAs):
+
+1. German (de)
+2. English (en)
+3. French (fr)
+4. Russian (ru)
+5. Chinese (zh)
+
+The remaining are other, we can classify now and make our lives easier.
+
+```{r language_recoding}
+nested <- nested %>%
+  ungroup() %>% 
+  mutate(language = ifelse(
+    language %in% c("de", "en", "fr", "ru", "zh", NA), language, "other"))
+```
+
+## What the domain distribution looks like
+
+```{r domain_plotting}
+nested %>%
+  group_by(domain) %>% 
+  summarise(n = n()) %>%
+  mutate(freq = n / sum(n) * 100) %>% 
+  drop_na() %>% 
+  ggplot(aes(x = domain, y = sort(freq), fill = domain)) +
+  geom_col() +
+  ylab("Proportion of pages with language") + 
+  theme(legend.position = "")
+```
+
+This seems to be working well. Now we can compare articles across different languages. 
+
+## Getting a sense for trends
+
+If there is clear trend in the data, it would be important to identify it early. Looking at the first time series in the `nested` dataframe as an example. We use a log-scale for the y-axis, we can see some more structure to mitigate the effect of large spikes.
+
+```{R}
+# isolate the first page
+first_page <- head(nested, 1)
+
+# plot the series of the first page
+first_page %>%
+      .$data %>%
+      .[[1]] %>%
+      ggplot(aes(x = date, y = views, color = views)) + 
+            geom_point() + 
+            geom_line() + 
+            scale_y_log10()
+```
+
+
+```{R}
+# a function to plot a simple time series plot on a log scale for the y-axis 
+plot_series_log <- function(df, title = NULL){
+      df %>%
+            ggplot(aes(x = date, y = views, color = views)) + 
+            geom_point() + 
+            geom_line() + 
+            labs(title = paste(title, "series", sep = " ")) + 
+            scale_y_log10() + 
+            theme(legend.position = "")
+}
+
+
+first_page %>%
+      .$data %>%
+      .[[1]] %>%
+      plot_series_log(title = first_page$article)
+```
+
+Trend sais about the article but what about the rest of them, how can they be compared?
+
+Let's try to compare them and get a more relevant page. To get a feel for how popular each page is, I'll store average, median, and standard deviation of the daily veiws for each page in the `nested` dataframe.
+
+To do so without unnesting the nested data in `nested`, I'll use a higher order function, `extract_metric`. This function takes in a nested dataframe `d`, and a function used to calculalate a metric `metric`, and returns the that function applied to the `views` column of the nested dataset. I can then map this function with `metric` euqual to `mean`, `median` and `function(l) sqrt(var(l)` to get the average, median and standard deviation of of the `views` in each nested dataframe. 
+
+```{r nested_metrics}
+# apply an arbitrary metrix on the `views` column of of the nested data
+extract_metric <- function(d, metric, ...){
+      metric(d$views, ...)
+}
+
+# map this H.O.F to get the average, median and standard deviation of views
+nested <-  nested %>% 
+  mutate(average.views = map_dbl(.f = extract_metric, 
+                                 .x = data, metric = mean, na.rm = TRUE), 
+         median.views = map_dbl(.f = extract_metric, .x = data, 
+                                metric = median, na.rm = TRUE), 
+         stddev.views = map_dbl(.f = extract_metric, .x = data, 
+                                metric = function(l) sqrt(var(l, na.rm = TRUE))))
+```
+
+Now we have the mean, median and standard deviation of the views stored in `nested`.
+
+```{r glimpse}
+head(nested)
+```
+
+Now we have the mean, median and standard deviation of the views stored in `nested`.
+
+The mean or average is the expected value of a variable. (The density is a _smoothed histogram_).
+
+```{r average}
+nested %>%
+      ggplot(aes(x = average.views, fill = language)) + 
+      geom_density(position = "stack") + 
+      scale_x_log10() +
+      xlab("Average daily views (log scale)")
+```
+
+This means that the english pages expect mode daily views than the rest languages.
+
+```{r median}
+nested %>%
+      ggplot(aes(x = median.views, fill = language)) + 
+      geom_density(position = "stack") + 
+      scale_x_log10() +
+      xlab("Median daily views (log scale)")
+
+```
+
+The median is the number such that the probability is at least 1/2 (50%) that a randomly chosen point on the function will be less than or equal to the median, and the probability is at least 1/2 that a randomly chosen point on the function will be greater than or equal to the median.
+
+```{r standard_deviation}
+nested %>%
+      ggplot(aes(x = stddev.views, fill = language)) + 
+      geom_density(position = "stack", alpha = 0.5) + 
+      scale_x_log10() +
+      xlab("Standard deviation of daily views (log scale)")
+```
+
+Standard deviation denotes how far apart all the numbers are in a set.
+
+Now, arranging the views in terms of decending average view count:
+
+
+```{R}
+nested %>%
+      arrange(desc(average.views))
+```
+
+# Modelling a linear trend
+
+Now for the fun stuff - mapping models onto the nested data. As a first step, I will try and model the trend of the view count using simple linear regression. Then, looking at measures of model quality such as the $R^2$, I can see which series are well explained with a linear trend, and which have more complex changes in mean. 
+
+To apply a linear model to each of the nested dataframes, I'll first design a function that takes in a dataframe, and applies simple linear regression onto it. After, mapping this function onto each of the nested dataframes, we can get a new column, `linear_trend`, which stores linear models, fit onto each corresponding nested dataframe:
+
+```{r linear_model}
+# a function for fitting SLR to an inptut dataframe
+apply_lm <- function(df){
+      lm(data = df, views ~ date)
+}
+
+# fit a linear model to each page
+nested <-  nested %>%
+      mutate(linear_trend = map(.f = apply_lm, .x = data))
+
+# isolate the first page
+first_page <- head(nested, 1)
+```
+
+Now, along with a list column of the data for each page in a column, we also have a fitted linear model object stored in a seperate column for each wikipedia page:
+
+```{r glimpse_lm}
+nested %>%
+  head() %>%
+  select(article, data, linear_trend)
+```
+For example, if we wanted to see the summary of the first linear model fit:
+
+
+```{r head_lm}
+nested %>% head(1) %>% .$linear_trend 
+```
+
+It'd be interesting to store a measure of model quality for each of these linear models - namely the $R^2$ statistic. This will be helpful, as looking at each model's $R^2$ will help us highlight which Wikipedia pages exhibit clear linear trend, and which don't (this might be hard to determine otherwise - can you think of a good way to do so?)
+
+
+I'll define a function `extract_r2` - which uses the `broom` function to extract the $R^2$ of a linear model. I'll then map this function onto nested `lm` models to store the $R^2$ for each model:
+
+
+```{r r_sq}
+# a function for extracting only the R-squared statistics
+extract_r2 <- function(model){
+  glance(model)$r.squared
+}
+
+# map this function onto each model to store the R^2
+nested <- nested %>%
+  mutate(lm.r.squared = purrr::map_dbl(.f = extract_r2, .x = linear_trend))
+
+```
+
+Looking at the distribution of $R^2$ across the different Wikipedia pages:
+
+
+```{r plot_r_sq}
+nested %>%
+  ggplot(aes(x = lm.r.squared)) + 
+  geom_density()
+```
+
+Most of the time series can not be explained well by a linear model, leading to low $R^2$. 
+
+Some models have suspiciously high $R^2$ values - I suspect this is because most of the data is missing, and thus a linear model can fit these sparse data more effectively. To test this hypothesis, I can plot the model with the highest $R^2$:
+
+```{r plot_max_r_sq}
+# a funtion for plotting a time series, with a fitted linear trend line on top of it
+plot_linear_trend <- function(df, title){
+  df %>%
+    ggplot(aes(x = date, y = views, color = views)) +
+    geom_point() + 
+    geom_line() + 
+    geom_smooth(method = "lm", se = FALSE) + 
+    labs(title = title) + 
+    theme(legend.position = "")
+}
+
+nested %>%
+  arrange(desc(lm.r.squared)) %>%
+  head(1) %>%
+  mutate(chart = map2(.f = plot_linear_trend, .x = data, .y = article)) %>%
+  .$chart
+```
+
+Indeed - the model with the highest $R^2$ has only 2 non-missing points - which can be fitted perfectly by a line. 
+
+But if we skip the pages with the 50 highest $R^2$ values, we can really see that these models have a roughly linear trend:
+
+
+```{r 5_middle_r_sq}
+nested %>%
+      arrange(desc(lm.r.squared)) %>%
+      filter(dplyr::between(row_number(), 50, 55)) %>%
+      mutate(chart = purrr::map2(.f = plot_linear_trend, 
+                                 .x = data, .y = article)) %>%
+      .$chart
+```
+
+Now, looking at the model with the lowest $R^2$:
+
+```{r lowest_r_sq}
+nested %>%
+      arrange(lm.r.squared) %>%
+      .[1,] %>%
+       mutate(chart = purrr::map2(.f = plot_linear_trend, 
+                                  .x = data, .y = article)) %>%
+      .$chart
+```
+
+Now, looking at plots of series which don't have extraordinarily high or low $R^2$ (to avoid series with mostly missing values), we find some series that truly exhibit non-linear trends, resulting in low $R^2$:
+
+
+```{r }
+nested %>%
+      arrange(desc(lm.r.squared)) %>%
+      filter(dplyr::between(row_number(), 1000, 1005)) %>%
+      mutate(chart = purrr::map2(.f = plot_linear_trend, 
+                                 .x = data, .y = article)) %>%
+      .$chart
 ```
